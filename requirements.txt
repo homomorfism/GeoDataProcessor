@@ -1,0 +1,5 @@
+slidingwindow
+numpy
+rasterio
+shapely
+fiona
