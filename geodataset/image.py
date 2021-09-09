@@ -3,15 +3,14 @@ import sys
 from pathlib import Path
 
 import rasterio
-from rasterio.io import DatasetReader
 from rasterio.windows import Window
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 
 class GeoImage:
-    def __init__(self, image: DatasetReader):
-        self.image = image
+    def __init__(self, image_path: Path):
+        self.image = rasterio.open(image_path)
         self.logger = logging.getLogger()
 
     @property
@@ -36,3 +35,6 @@ class GeoImage:
         with rasterio.open(saving_path, 'w', **profile) as dst:
             crop = self.image.read(window=projected_window)
             dst.write(crop)
+
+    def close(self):
+        self.image.close()

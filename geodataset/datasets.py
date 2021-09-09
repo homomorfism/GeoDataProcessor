@@ -47,9 +47,6 @@ class GeoImageDataset:
                 x, y, h, w = window.getRect()
 
 
-            print()
-
-
 if __name__ == '__main__':
     images = Path("/home/shamil/PycharmProjects/GeoDataset/tests/dataset/images")
     shp = Path("/home/shamil/PycharmProjects/GeoDataset/tests/dataset/shp_files")

@@ -1,6 +1,7 @@
 from pathlib import Path
 
-from shapely.geometry import Polygon
+import fiona
+from shapely.geometry import Polygon, shape
 
 """
 Clipping polygons
@@ -10,10 +11,16 @@ https://hatarilabs.com/ih-en/how-to-clip-polygon-layers-with-python-fiona-and-sh
 
 class GeoShpFile:
 
-    def __init__(self, shp_file: Path):
-        assert shp_file.is_file()
+    def __init__(self, path: Path):
+        assert path.is_file()
 
-        self.shp_file = shp_file
+        self.shp_file = fiona.open(path)
 
-    def clip_polygons(self, x, y, h, w) -> list[Polygon]:
+    def get_pixel_polygons(self, window: tuple[int, int, int, int]) -> list[Polygon]:
+        x, y, h, w = window
+
+        for el in self.shp_file:
+            geopolygon = shape(el['geometry'])
+            # TODO(Convert geo coordinates to pixels)
+
         pass
