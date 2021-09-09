@@ -1,8 +1,10 @@
 from pathlib import Path
 
+import slidingwindow as sw
+
 from geodataset.image import GeoImage
 from geodataset.io.parse_directory import filter_files
-import slidingwindow as sw
+
 
 class GeoImageDataset:
     """Image data class"""
@@ -23,23 +25,26 @@ class GeoImageDataset:
         return len(self.images)
 
     def clip_dataset(self, clip_size: int, output_directory: Path):
+        counter = 0
 
         if not output_directory.is_dir():
             output_directory.mkdir()
 
-        for image, shp in zip(sorted(self.images), sorted(self.shp_dataset)):
+        crop_path = output_directory / "images"
+        crop_path.mkdir(exist_ok=True)
+
+        for ii, (image, shp) in enumerate(zip(sorted(self.images), sorted(self.shp_dataset))):
             image = GeoImage(image)
 
             windows = sw.generate(data=image,
-                                 dimOrder=sw.DimOrder.ChannelHeightWidth,
-                                 maxWindowSize=clip_size,
-                                 overlapPercent=0.0)
-
+                                  dimOrder=sw.DimOrder.ChannelHeightWidth,
+                                  maxWindowSize=clip_size,
+                                  overlapPercent=0.0)
 
             for window in windows:
+                image_path = output_directory / f"{counter}.tif"
+                image_name = image_path.name
                 x, y, h, w = window.getRect()
-
-                image_crop = image.g
 
 
             print()
