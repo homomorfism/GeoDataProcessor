@@ -1,24 +1,34 @@
+import os
 from pathlib import Path
+from typing import Union
 
+import numpy as np
 import slidingwindow as sw
 
+from geodataset.GeoFile import GeoShpFile
+from geodataset._io.parse_directory import filter_files, get_parents_folder, create_empty_folder
 from geodataset.image import GeoImage
-from geodataset.io.parse_directory import filter_files
+
+AnyPath = Union[Path, str, os.PathLike]
 
 
 class GeoImageDataset:
     """Image data class"""
 
     def __init__(self,
-                 image_dataset: Path,
-                 shp_dataset: Path,
+                 image_dataset: AnyPath,
+                 shp_dataset: AnyPath,
                  supported_image_formats=('.tiff', '.tif',),
                  supported_gt_formats=('.shp',)
                  ):
+
+        image_dataset, shp_dataset = Path(image_dataset), Path(shp_dataset)
         self.images: list[Path] = filter_files(folder=image_dataset, supported_formats=supported_image_formats)
-        self.shp_dataset: list[Path] = filter_files(folder=shp_dataset, supported_formats=supported_gt_formats)
+        self.shp_dataset: list[Path] = get_parents_folder(folder=shp_dataset, supported_formats=supported_gt_formats)
+        self.check_consistency()
 
     def check_consistency(self):
+        """Check that shp dataset consists from folders and name of folders matches with image names"""
         pass
 
     def __len__(self):
@@ -30,27 +40,40 @@ class GeoImageDataset:
         if not output_directory.is_dir():
             output_directory.mkdir()
 
-        crop_path = output_directory / "images"
-        crop_path.mkdir(exist_ok=True)
+        image_crop_path = output_directory / "images"
+        shp_crop_path = output_directory / "labels"
 
-        for ii, (image, shp) in enumerate(zip(sorted(self.images), sorted(self.shp_dataset))):
-            image = GeoImage(image)
+        create_empty_folder(image_crop_path)
+        create_empty_folder(shp_crop_path)
 
-            windows = sw.generate(data=image,
+        iter_list = enumerate(zip(sorted(self.images), sorted(self.shp_dataset)))
+        for ii, (image_path, shp_path) in iter_list:
+            image = GeoImage(image_path)
+            transform = image.get_transform()
+            shp_file = GeoShpFile(shp_path, transform=transform)
+
+            windows = sw.generate(data=np.empty(shape=image.shape()),
                                   dimOrder=sw.DimOrder.ChannelHeightWidth,
                                   maxWindowSize=clip_size,
                                   overlapPercent=0.0)
 
             for window in windows:
-                image_path = output_directory / f"{counter}.tif"
-                image_name = image_path.name
-                x, y, h, w = window.getRect()
+                image_clip_path = image_crop_path / f"{counter}.tif"
+                shp_clip_path = shp_crop_path / f"{counter}"  # It would be a folder with .shp/.prj files
+                box = window.getRect()
+                image.save_crop(box, saving_path=image_clip_path)
+                shp_file.save_clip(box, saving_folder=shp_clip_path)
+
+                print(123)
 
 
 if __name__ == '__main__':
-    images = Path("/home/shamil/PycharmProjects/GeoDataset/tests/dataset/images")
-    shp = Path("/home/shamil/PycharmProjects/GeoDataset/tests/dataset/shp_files")
+    images = Path("/home/shamil/PycharmProjects/GeoDataProcessor/tests/dataset/images")
+    shp = Path("/home/shamil/PycharmProjects/GeoDataProcessor/tests/dataset/shp_files")
+    cropped_output_folder = Path("/home/shamil/PycharmProjects/GeoDataProcessor/tests/cropped_dataset")
+
+    assert images.is_dir()
+    assert shp.is_dir()
 
     dataset = GeoImageDataset(image_dataset=images, shp_dataset=shp)
-
-    dataset.clip_dataset(clip_size=256, output_directory=Path(""))
+    dataset.clip_dataset(clip_size=256, output_directory=cropped_output_folder)

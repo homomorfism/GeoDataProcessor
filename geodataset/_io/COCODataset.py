@@ -6,7 +6,7 @@ from pathlib import Path
 
 from shapely.geometry import Polygon
 
-from geodataset.io.polygons import polygon_to_segmentation
+from geodataset._io.polygons import polygon_to_segmentation
 
 logging.basicConfig(format="[COCODataset] %(message)s", stream=sys.stdout, level=logging.INFO)
 

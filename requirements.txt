@@ -3,3 +3,7 @@ numpy
 rasterio
 shapely
 fiona
+pyproj
+affine
+matplotlib
+geopandas
