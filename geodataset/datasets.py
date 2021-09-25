@@ -4,6 +4,7 @@ from typing import Union
 
 import numpy as np
 import slidingwindow as sw
+from rasterio.transform import guard_transform
 
 from geodataset.GeoFile import GeoShpFile
 from geodataset._io.parse_directory import filter_files, get_parents_folder, create_empty_folder
@@ -49,7 +50,7 @@ class GeoImageDataset:
         iter_list = enumerate(zip(sorted(self.images), sorted(self.shp_dataset)))
         for ii, (image_path, shp_path) in iter_list:
             image = GeoImage(image_path)
-            transform = image.get_transform()
+            transform = guard_transform(image.get_transform())
             shp_file = GeoShpFile(shp_path, transform=transform)
 
             windows = sw.generate(data=np.empty(shape=image.shape()),
@@ -64,7 +65,7 @@ class GeoImageDataset:
                 image.save_crop(box, saving_path=image_clip_path)
                 shp_file.save_clip(box, saving_folder=shp_clip_path)
 
-                print(123)
+                counter += 1
 
 
 if __name__ == '__main__':
@@ -76,4 +77,4 @@ if __name__ == '__main__':
     assert shp.is_dir()
 
     dataset = GeoImageDataset(image_dataset=images, shp_dataset=shp)
-    dataset.clip_dataset(clip_size=256, output_directory=cropped_output_folder)
+    dataset.clip_dataset(clip_size=1024, output_directory=cropped_output_folder)
