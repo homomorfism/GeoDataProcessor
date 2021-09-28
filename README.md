@@ -49,7 +49,7 @@ Input image with labels            |  Cropped image with labels
     - ```cd GeoDataProcessor```
     - ```pip install .```
 - from pypl
-    - to be added
+    - ```pip install GeoDataProcessor==1.0```
 
 ## Run tests
 
