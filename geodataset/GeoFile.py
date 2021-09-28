@@ -49,7 +49,6 @@ class GeoShpFile:
             'geometry': 'Polygon',
             'properties': [('Name', "str")]
         }
-        print(f"Saving clip: {saving_folder}")
         with fiona.open(
                 saving_folder,
                 mode='w',
