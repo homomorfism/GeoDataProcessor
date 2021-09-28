@@ -1,21 +1,58 @@
-Basic geo large images to coco clipped coco dataset
+# GeoDataProcessor
 
-Example of usage:
+## Description
+
+Fast library that crops large satellite images files to small tiles for passing it to model. Library takes as an input
+directory with geo images and labels (as it shown in example of usage), makes clipping on input data and saves clipped
+tiles to `saving_folder/images` and `saving_folder/labels` respectively.
+
+## Example of usage
+
+- examples/preprocess_example.py
 
 ```python
-
-from geodataset.datasets import GeoImageDataset
 from pathlib import Path
-import json
-
-dataset = GeoImageDataset(image_dataset="images", shp_dataset="labels")
-clipped_dataset = dataset.clip_dataset(clip_size=512, output_directory="clipped") # Here would be stored image and shp clips (coordinate systems are preserved)
-coco_json = clipped_dataset.generate_coco()
-
-with open("coco_annotations.json") as file:
-    file.write(json.dumps(coco_json))
+from geodataset.datasets import GeoImageDataset
 
 
+def preprocess(images, labels, tile_size, saving_folder):
+    dataset = GeoImageDataset(image_dataset=images,
+                              shp_dataset=labels)
+
+    dataset.clip_dataset(tile_size, output_directory=saving_folder)
+
+
+def main():
+    images = Path("data/images")
+    labels = Path("data/labels")
+    saving_folder = Path("cleaned/")
+    saving_folder.mkdir()
+
+    tile_size = 1024
+    preprocess(images, labels, tile_size, saving_folder)
+
+
+if __name__ == '__main__':
+    main()
 ```
 
+## Examples of input and output
 
+Input image with labels            |  Cropped image with labels
+:-------------------------:|:-------------------------:
+![](images/input.png)  |  ![](images/output.png)
+
+## Installing
+
+- locally:
+    - ```git clone https://github.com/homomorfism/GeoDataProcessor```
+    - ```cd GeoDataProcessor```
+    - ```pip install .```
+- from pypl
+    - to be added
+
+## Run tests
+
+```bash
+pytest
+```

@@ -27,7 +27,6 @@ class GeoShpFile:
         x, y, w, h = window
         window_box: Polygon = box(x, y, x + w, y + h)
         window_geo = affine_transform(window_box, self.transform)
-        # print(f"window_geo: {window_geo}")
 
         geopolygons = self.read_geopolygons()
 
