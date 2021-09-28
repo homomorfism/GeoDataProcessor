@@ -34,10 +34,8 @@ class GeoShpFile:
         for geopolygon in geopolygons:
             if geopolygon.intersects(window_geo):
                 intersection = geopolygon.intersection(window_geo)
-                # Intersection could return MultiPolygon - we can split it
-                # into polygons, reference:
-                # https://stackoverflow.com/questions/55106744/how-do-you-convert-shapely-multipolygon-to-polygon
-                if intersection.boundary == 'MultiPolygon':
+                # Intersection could return MultiPolygon - we can split it into polygons
+                if intersection.geom_type == 'MultiPolygon':
                     for polygon in intersection.geoms:
                         filtered_polygons.append(polygon)
                 else:
@@ -56,14 +54,8 @@ class GeoShpFile:
                 schema=schema
         ) as file:
             for polygon in filtered_polygons:
-                # Intersection could return MultiPolygon - we can split it
-                # into polygons, reference:
-                # https://stackoverflow.com/questions/55106744/how-do-you-convert-shapely-multipolygon-to-polygon
-                if polygon.geom_type == 'MultiPolygon':
-                    for poly in polygon.geoms:
-                        file.write(self.generate_row_dictionary(poly))
-                else:
-                    file.write(self.generate_row_dictionary(polygon))
+                assert polygon.geom_type != 'MultiPolygon'
+                file.write(self.generate_row_dictionary(polygon))
 
     def read_geopolygons(self) -> list[Polygon]:
         polygons = []
