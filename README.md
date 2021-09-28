@@ -10,7 +10,7 @@ tiles to `saving_folder/images` and `saving_folder/labels` respectively.
 
 - examples/preprocess_example.py
 
-```python
+```python 
 from pathlib import Path
 from geodataset.datasets import GeoImageDataset
 
