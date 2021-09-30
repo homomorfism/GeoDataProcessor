@@ -12,6 +12,7 @@ tiles to `saving_folder/images` and `saving_folder/labels` respectively.
 
 ```python 
 from pathlib import Path
+from geodataset.fileutils.parse_directory import create_empty_folder
 from geodataset.datasets import GeoImageDataset
 
 
@@ -25,34 +26,39 @@ def preprocess(images, labels, tile_size, saving_folder):
 def main():
     images = Path("data/images")
     labels = Path("data/labels")
-    saving_folder = Path("cleaned/")
-    saving_folder.mkdir()
+    saving_folder = Path("buildings_train/")
+    create_empty_folder(saving_folder)
 
-    tile_size = 1024
+    tile_size = 512
     preprocess(images, labels, tile_size, saving_folder)
 
 
 if __name__ == '__main__':
     main()
+
 ```
 
 ## Examples of input and output
 
 Input image with labels            |  Cropped image with labels
 :-------------------------:|:-------------------------:
-![](images/input.png)  |  ![](images/output.png)
+| ![](images/input.png)  |  ![](images/output.png) |
+| ![](images/input_buildings.png) | ![](images/output_buildings.png) |
 
 ## Installing
 
 - locally:
-    - ```git clone https://github.com/homomorfism/GeoDataProcessor```
-    - ```cd GeoDataProcessor```
-    - ```pip install .```
+  - ```git clone https://github.com/homomorfism/GeoDataProcessor```
+  - ```cd GeoDataProcessor```
+  - ```pip install .```
 - from pypl
-    - ```pip install GeoDataProcessor==1.0```
+  - ```pip install GeoDataProcessor==1.0```
 
 ## Run tests
 
-```bash
-pytest
-```
+Run `$ pytest`
+
+## References
+
+Data of segmentation of buildings were taken
+from [aeronet tutorials](https://github.com/aeronetlab/aeronet-tutorials/releases/download/0.0.1/buildings_segmentation.zip)

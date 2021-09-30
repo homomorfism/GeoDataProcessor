@@ -13,8 +13,8 @@ def clip_image(image_path, label_path, box):
 
 
 def main():
-    image_path = Path("data/images/image1.tif")
-    label_path = Path("data/labels/image1")
+    image_path = Path("data/images/buildings_train.tif")
+    label_path = Path("data/labels/buildings_train")
     box = (0, 0, 1024, 712)
 
     clip_image(image_path, label_path, box)

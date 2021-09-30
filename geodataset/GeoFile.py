@@ -1,16 +1,16 @@
+import logging
+import sys
 from pathlib import Path
 
 import fiona
 import numpy as np
 from affine import Affine
 from shapely.affinity import affine_transform
+from shapely.errors import TopologicalError
 from shapely.geometry import Polygon, shape
 from shapely.geometry import box
 
-"""
-Clipping polygons
-https://hatarilabs.com/ih-en/how-to-clip-polygon-layers-with-python-fiona-and-shapely-tutorial
-"""
+logging.basicConfig(stream=sys.stdout, format="[GeoShpFile] %(message)s")
 
 
 class GeoShpFile:
@@ -22,6 +22,7 @@ class GeoShpFile:
         # https://gis.stackexchange.com/questions/380357/affine-tranformation-matrix-shapely-asks-6-coefficients-but-rasterio-delivers
         self.transform = [element for array in transform.column_vectors for element in array]
         self.shp_file = fiona.open(path)
+        self.logger = logging.getLogger()
 
     def save_clip(self, window: tuple[int, int, int, int], saving_folder: Path) -> None:
         x, y, w, h = window
@@ -33,16 +34,34 @@ class GeoShpFile:
         filtered_polygons = []
         for geopolygon in geopolygons:
             if geopolygon.intersects(window_geo):
-                intersection = geopolygon.intersection(window_geo)
-                # Intersection could return MultiPolygon - we can split it into polygons
-                if intersection.geom_type == 'MultiPolygon':
-                    for polygon in intersection.geoms:
-                        filtered_polygons.append(polygon)
-                else:
+                try:
+                    intersection = geopolygon.intersection(window_geo)
+                except TopologicalError:
+                    self.logger.info("topological error, skipping...")
+                    continue
+
+                geom_type = intersection.geom_type
+                assert geom_type in ['Polygon', 'MultiPolygon', 'GeometryCollection', 'LineString']
+
+                if geom_type == 'Polygon':
                     filtered_polygons.append(intersection)
 
-        # Drawing polygons in shp file, reference:
-        # https://hatarilabs.com/ih-en/how-to-create-a-pointlinepolygon-shapefile-with-python-and-fiona-tutorial
+                elif geom_type == 'MultiPolygon':
+                    for polygon in intersection.geoms:
+                        filtered_polygons.append(polygon)
+
+                elif geom_type == 'GeometryCollection':
+                    for obj in intersection.geoms:
+                        if obj.geom_type == 'Polygon':
+                            filtered_polygons.append(obj)
+
+                elif geom_type == 'LineString':
+                    pass
+
+                else:
+                    self.logger.info(f"Geometry: {geom_type} is not supported! Skipping...")
+
+        # Converting polygons into shp file
         schema = {
             'geometry': 'Polygon',
             'properties': [('Name', "str")]
@@ -55,6 +74,9 @@ class GeoShpFile:
         ) as file:
             for polygon in filtered_polygons:
                 assert polygon.geom_type != 'MultiPolygon'
+                if polygon.geom_type == 'GeometryCollection':
+                    for obj in polygon.geoms:
+                        print(obj)
                 file.write(self.generate_row_dictionary(polygon))
 
     def read_geopolygons(self) -> list[Polygon]:
