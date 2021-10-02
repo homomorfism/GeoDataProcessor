@@ -11,7 +11,7 @@ def filter_files(folder: Path, supported_formats: tuple[str]) -> list[Path]:
 
     :return: list of found files matching extensions
     """
-    assert folder.is_dir(), f"{str(folder)} not a folder"
+    assert folder.is_dir(), f"{str(folder.resolve())} not a folder"
 
     files = []
     for path in folder.rglob("**/*"):
