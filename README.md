@@ -2,9 +2,10 @@
 
 ## Description
 
-Fast library that crops large satellite images files to small tiles for passing it to model. Library takes as an input
-directory with geo images and labels (as it shown in example of usage), makes clipping on input data and saves clipped
-tiles to `saving_folder/images` and `saving_folder/labels` respectively.
+This library aims to help ML engineers to work with large satellite images. GeoDataProcessorv is fast python library
+that crops large satellite images files to small tiles for passing it to model. Library takes as an input directory with
+geo images and labels (as it shown in example of usage), makes clipping on input data and saves clipped tiles
+to `saving_folder/images` and `saving_folder/labels` respectively.
 
 ## Example of usage
 
