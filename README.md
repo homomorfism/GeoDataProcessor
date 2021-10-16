@@ -1,5 +1,6 @@
 # GeoDataProcessor
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/bea79db8d4914974a3be98da5a9a20c7)](https://app.codacy.com/gh/homomorfism/GeoDataProcessor?utm_source=github.com&utm_medium=referral&utm_content=homomorfism/GeoDataProcessor&utm_campaign=Badge_Grade_Settings)
 [![codecov](https://codecov.io/gh/homomorfism/GeoDataProcessor/branch/master/graph/badge.svg?token=467K7ARKP0)](https://codecov.io/gh/homomorfism/GeoDataProcessor)
 
 ## Description
