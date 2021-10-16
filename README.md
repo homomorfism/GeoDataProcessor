@@ -1,5 +1,7 @@
 # GeoDataProcessor
 
+[![codecov](https://codecov.io/gh/homomorfism/GeoDataProcessor/branch/master/graph/badge.svg?token=467K7ARKP0)](https://codecov.io/gh/homomorfism/GeoDataProcessor)
+
 ## Description
 
 This library aims to help ML engineers to work with large satellite images. GeoDataProcessorv is fast python library
